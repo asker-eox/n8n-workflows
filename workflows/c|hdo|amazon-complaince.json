@@ -1,0 +1,2354 @@
+{
+  "createdAt": "2025-07-18T06:17:13.222Z",
+  "updatedAt": "2025-07-18T06:17:13.344Z",
+  "id": "K0IV8yBc2vOD6jFr",
+  "name": "C|HDO|Amazon Complaince",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "19dd8f52-4702-45de-bc10-f41df04554df",
+              "leftValue": "={{$node['Get DSP admin file'].json.total}}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": []
+      },
+      "id": "3be87aab-3f86-4eca-a33e-efe19705159e",
+      "name": "Check if dsp compliance record created",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        100,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0e61a610-e740-4200-b9ef-b891017386cb",
+              "leftValue": "={{$node['Compliance Data'].json.userRoleType }}",
+              "rightValue": "DSP Admin",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": []
+      },
+      "id": "a75acdb0-f5b6-40af-bbf5-cf079c6fef2e",
+      "name": "Checking DSP",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/search/entity/amazonCompliance/assoc/{{ $node['Get User Details'].json[\"data\"][0].uuid }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            []
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "3ba173a6-9615-4f62-88e8-e658ffe2f30f",
+      "name": "Get DSP admin file",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -220,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "ea4b1b4a-b4bf-4d14-bf21-c6ae629b14ec",
+              "leftValue": "={{ $node['Get DSP admin file'].json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": []
+      },
+      "id": "bd9894a2-3189-4463-87dd-652532fabd64",
+      "name": "If5",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\noutput = {}\nlet input= $('Compliance Data').all()[0].json\nlet userdetails = $('Get User Details').all()[0].json.data[0];\n\n\nlet companyDetails =  $('Get Company Details').all()[0].json.data.data;\n/*if(input.COIupload.length != 0){\n  output.COIupload = input.COIupload;\n}*/\nuserdetails.middlename = (userdetails.middlename && userdetails.middlename!= \"\")? userdetails.middlename : ' '\noutput.assignedto = userdetails.assignedto;\noutput.assocId = userdetails.uuid;\noutput.assigned_team = userdetails.assigned_team;\noutput.name = userdetails.firstname +userdetails.middlename+ userdetails.lastname;\noutput.status = 'Non-Compliant';\noutput.DSPshortCode =input.DSPshortCode ;\noutput.isDsp = \"Yes\";\noutput.email = userdetails.email;\noutput.companyname = companyDetails.companyname;\noutput.commands = [{\n  command: 'fileSave',\n  entity_name: 'amazonCompliance'\n}];\n\n\nreturn output"
+      },
+      "id": "6ccfd665-f323-489a-8384-6592a7106697",
+      "name": "Compliance data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nreturn $('Compliance Data').all()[0].json.DriverDataArray"
+      },
+      "id": "4ca1a05f-939a-4d24-90fa-a82f9fe95f14",
+      "name": "Labor data check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "options": []
+      },
+      "id": "3d1225f6-b908-42a6-808e-526660a4f660",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1700,
+        920
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3e7083d1-3d84-4a22-87a6-80b0cdf99384",
+      "name": "Data Fetcher",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n//output.locationDropdown = otherDetails.locationDropdown;\nlet file_present = $('Data Fetcher').all()[0].json;\nlet otherDetails = $('Compliance Data').all()[0].json;\nlet DriverDetails = $('Get User Details Driver').all()[0].json.data[0];\nlet companyDetails =  $('Get Company Details').all()[0].json.data.data;\nlet output = {};\noutput.firstName = file_present.firstname;\noutput.lastName = file_present.lastname;\noutput.email = file_present.email;\noutput.assignedto = DriverDetails.assignedto;\noutput.assocId = DriverDetails.uuid;\noutput.assigned_team = otherDetails.assigned_team;\noutput.name = output.firstName+' '+output.lastName;\noutput.status = 'Non-Compliant';\n/*if(file_present?.userActStatus != 'Active'){\n  output.status = 'InActive';\n}\nelse {\n  output.status = 'Non-Compliant';\n}*/\noutput.isDsp = \"No\";\noutput.assignedDSPEmail = companyDetails.companyAdminEmail; \noutput.DSPshortCode = otherDetails.DSPshortCode;\noutput.companyname = companyDetails.companyname;\noutput.commands = [{\n  command: 'fileSave',\n  entity_name: 'amazonCompliance'\n}];\nreturn output"
+      },
+      "id": "192b1b4a-bc16-4f1b-96c6-3a69cdb5cdae",
+      "name": "Driver Compliance data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "750eed3c-dd04-419b-8652-f8377502700f",
+              "leftValue": "={{ $node['Data Fetcher'].json.assocId}}",
+              "rightValue": "empty",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "08057e25-2d29-4e9a-94b0-caff49db01c8",
+      "name": "If10",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set1\"].json[\"apiurl\"]}}app/{{ $node['Set1'].json[\"appid\"] }}/pipeline",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/json",
+        "body": "={{ $node['Driver Compliance data'].json }}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "c7c6be98-2327-4ac6-a481-0dd85738142c",
+      "name": "Save Driver Compliance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        3020,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set1\"].json[\"apiurl\"]}}app/{{ $node['Set1'].json[\"appid\"] }}/pipeline",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/json",
+        "body": "={{ $node['Compliance data'].json }}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "aa75d7ac-ae3e-4126-9686-79e985e0e7aa",
+      "name": "Save DSP Compliance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        660,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "f290c5e9-20d4-40f1-80b6-61f75678909d",
+              "leftValue": "={{$node['User Details compliance'].json.data.designation }}",
+              "rightValue": "EOX Backroom Verify",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": []
+      },
+      "id": "bb296742-8f49-42d5-8579-b32700ab1e77",
+      "name": "If11",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "236",
+        "options": []
+      },
+      "name": "PDF Mapping3",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1760,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "1578c2b5-2368-4d83-9611-87ec4cf6b0f7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set\"].json[\"apiurl\"]}}app/{{ $node['Set'].json['appid'] }}/file/attachment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token2\"].json[\"data\"][\"jwt\"]}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "fileId",
+              "value": "={{ $node['Webhook'].json[\"body\"][\"fileId\"] }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $node['PDF Mapping3'].binary.data.fileName }}"
+            },
+            {
+              "name": "fieldLabel",
+              "value": "Checklist"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text",
+              "outputPropertyName": "document"
+            }
+          }
+        }
+      },
+      "id": "91fbbac8-8322-4c9f-9a8d-51888d751d4a",
+      "name": "Save Attachment3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2040,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let output = [];\nlet pdftemplate;\nappid = $('Set').all()[0].json.appid\nlet url = $('Instance API').all()[0].json.redirectURL\nlet result = {};\nlet input = $('Webhook').all()[0].json.body\n\n  for (const key in input) {\n\n  if (input[key] === false && key !== \"is_draft\" && (typeof(input[key]) === 'boolean')) {\n    result[`pdf${key}`] = 'Yes';\n    result['nonCompliant'] = 'Yes'\n    result['status'] = 'Non-Compliant'\n    \n  }\n   \n}\nif(result[\"status\"] == null || result[\"status\"] == undefined || result[\"status\"] == \"\"){\n  result[\"Compliant\"] = 'Yes'\n  result['status'] = 'Compliant'\n}\n  \npdftemplate = input.isDsp === \"No\" \n  ? \"Driver Medical Card Checklist\" \n  : \"Checklist - HUB COI\";\n\n\n\n \nreturn { \"data\": JSON.stringify(result),\"pdf_url\": url+\"/apps/hdoum/img/template/\"+pdftemplate+\".pdf\",fileName :pdftemplate,saveAtt:\"Attachments\",\"status\":result['status']}"
+      },
+      "id": "aab6681e-e775-4bf0-b62b-9babf2559341",
+      "name": "Data for mapping",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"Set\"].json[\"apiurl\"] }}auth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "username",
+              "value": "hdoadmin"
+            },
+            {
+              "name": "password",
+              "value": "Welcome2eox!"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c9472cf9-b5e6-4d92-b4bb-9b97ce24615b",
+      "name": "Generate Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1880,
+        2000
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "apiurl",
+              "value": "={{ $node[\"Instance API\"].json[\"apiurl\"] }}/"
+            },
+            {
+              "name": "redirecturl",
+              "value": "={{ $node[\"Instance API\"].json[\"redirectURL\"] }}/"
+            },
+            {
+              "name": "appid",
+              "value": "=62bf6d03-9716-4fb6-b697-0fd442096e7a"
+            },
+            {
+              "name": "accountId",
+              "value": "cb008fec-b341-4c85-98cc-8726b7931d1c"
+            },
+            {
+              "name": "fileURL",
+              "value": "={{ $node[\"Instance API\"].json[\"fileURL\"] }}/"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "1363c852-98bc-4d47-8dcf-154a08db88b2",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "534",
+        "options": []
+      },
+      "id": "d32d7bcb-0443-43e8-b485-89b39737dd5b",
+      "name": "Instance API",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set\"].json[\"apiurl\"]}}app/{{ $node['Set'].json[\"appid\"] }}/pipeline",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token2\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/json",
+        "body": "={\n    \"status\": \"{{ $node['Data for mapping'].json[\"status\"] }}\",\n\"fileId\":\"{{ $node['Webhook'].json.body.fileId }}\",\n    \"commands\" : [{\n        \"command\": \"fileSave\",\n        \"entity_name\": \"amazonCompliance\"\n      }]\n      \n}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "2ad769dd-c0b2-45a7-af75-7ae2c059d23d",
+      "name": "Save status Compliance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2260,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set'].json[\"apiurl\"] }}user/me/a+p+acc+bapp+ap+t",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $node['Webhook'].json[\"headers\"][\"authorization\"] }}"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "630e17ab-9501-4445-91d1-6fbe5a9f2bc4",
+      "name": "User Details compliance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        -140
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "676c999f-7072-4d91-a420-f9ca7d6a285b",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "534",
+        "options": []
+      },
+      "id": "2a90c9d4-a983-4708-989e-124e2e0157e5",
+      "name": "Instance API1",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1800,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "apiurl",
+              "value": "={{ $node[\"Instance API1\"].json[\"apiurl\"] }}/"
+            },
+            {
+              "name": "redirecturl",
+              "value": "={{ $node[\"Instance API1\"].json[\"redirectURL\"] }}/"
+            },
+            {
+              "name": "appid",
+              "value": "=62bf6d03-9716-4fb6-b697-0fd442096e7a"
+            },
+            {
+              "name": "accountId",
+              "value": "cb008fec-b341-4c85-98cc-8726b7931d1c"
+            },
+            {
+              "name": "insurelearnapi",
+              "value": "https://hubstg.insurelearn.com/api/"
+            },
+            {
+              "name": "ILSUSER",
+              "value": "eox_connector"
+            },
+            {
+              "name": "ILSPASSWD",
+              "value": "P9mwT~%26/6Qk@y}hk"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "2316aa39-efdb-44fa-be3c-8934ddb4a8ff",
+      "name": "Set1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1060,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"Set1\"].json[\"apiurl\"] }}auth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "username",
+              "value": "hdoadmin"
+            },
+            {
+              "name": "password",
+              "value": "Welcome2eox!"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "8895ff33-9edd-4899-94fa-7ea48b4607f8",
+      "name": "Generate Token1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        3060,
+        1720
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d38200f0-55bc-48cf-ab10-003cc1c65a6b",
+      "name": "Compliance Data",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2060,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "33dd4406-5653-4f0b-884e-2c03e19c0a86",
+              "leftValue": "={{ $node['Flag to save companydetails'].json.input}}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "05c5325b-3269-460f-aca3-93254c5740fc",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        1780
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4fa590d7-c3bb-4190-963f-4fc4b95a4d3d",
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet file_present = $('Get file for other drivers').all()[0].json;\nlet otherDetails = $('Compliance Data').all()[0].json;\nlet output = {};\n\nif(file_present?.userActStatus != 'Active'){\n  output.status = 'InActive';\n}\nelse {\n  output.status = 'Non-Compliant';\n}\noutput.isDsp = \"No\";\noutput.assignedDSPEmail = otherDetails.assignedDSPEmail; \noutput.locationDropdown = otherDetails.locationDropdown;\noutput.companyname = otherDetails.companyname\noutput.commands = [{\n  command: 'fileSave',\n  entity_name: 'amazonCompliance'\n}];\nreturn output"
+      },
+      "id": "09a7a05f-00af-4a28-adea-9547e871402d",
+      "name": "update status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet input = $('Compliance Data').all()[0].json.saveCompanydetails\nreturn {input : input}"
+      },
+      "id": "5e39d87f-df4a-4d32-b59e-bc5af006a381",
+      "name": "Flag to save companydetails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c958443c-9e38-403a-b0f2-b2814bb415d4",
+              "leftValue": "={{ $node['Compliance Data').json.saveDSPComplianceobj.COIupload }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": []
+      },
+      "id": "0cd32ed5-f8a6-4430-a8f0-4715f7d6f749",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0e2d08f1-cad5-4db2-9fe9-7263c5f6fa80",
+              "leftValue": "={{$node['Compliance Data'].json.COIupload}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": []
+      },
+      "id": "de6982e8-9707-4088-91bc-f22e982e998d",
+      "name": "check if attachment exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": " let input = $('Compliance Data').all()[0].json.COIupload;\nlet output = {};\n\nlet attachment_output =(input && typeof (input) == 'string')? JSON.parse(input):\"\";\n\n//output = (attachment_output.length>0)?attachment_output[0].url:\"\"\n output = attachment_output.map(i => {\n  return { url: i.url };\n});\n\n  return output"
+      },
+      "id": "8de75fea-3e66-4922-b077-414004aa3b5b",
+      "name": "get attachment file from my company details",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        560
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set\"].json[\"apiurl\"]}}app/{{ $node['Set'].json['appid'] }}/file/attachment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"Generate Token\"].json[\"data\"][\"jwt\"]}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "fileId",
+              "value": "={{ $node['Webhook'].json[\"body\"][\"fileId\"] }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $node['PDF Mapping3'].binary.data.fileName }}"
+            },
+            {
+              "name": "fieldLabel",
+              "value": "Checklist"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text",
+              "outputPropertyName": "document"
+            }
+          }
+        }
+      },
+      "id": "bdcd3662-3c1c-4972-b7a2-e8ffe89693b5",
+      "name": "Save Attachment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2720,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set1\"].json[\"apiurl\"]}}app/{{ $node['Set1'].json['appid'] }}/file/attachment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "fileId",
+              "value": "={{ $node['Save DSP Compliance'].json[\"data\"][\"fileId\"] }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $node['Get attachment file'].binary.data.fileName }}"
+            },
+            {
+              "name": "fieldLabel",
+              "value": "Certificate Of Insurance"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text",
+              "outputPropertyName": "document"
+            }
+          }
+        }
+      },
+      "id": "47375515-c1c2-42e0-88ae-f13e4c05749a",
+      "name": "Save Attachment4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2940,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=",
+        "options": []
+      },
+      "id": "9ac5b853-d566-4236-9623-9c61716932fa",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        1780
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/search/entity/umadduser",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=[{\"filter\":{\"logic\":\"and\",\"filters\":[{\"field\":\"email\",\"operator\":\"eq\",\"value\":\"{{ $node['Get Company Details'].json[\"data\"][\"data\"][\"email\"] }}\"}]},\"sort\":[{\"dir\":\"asc\",\"field\":\"username\"}],\"take\":1,\"skip\":0}]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "4366a3c5-ab49-4d8e-ad3c-0955ea398e3c",
+      "name": "Get User Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -460,
+        620
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}user/me/a+p+acc+bapp+ap+t",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $node['Fetch Location'].json[\"headers\"][\"authorization\"] }}"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "729de6a9-79df-46b7-ba2f-e8c783594513",
+      "name": "User Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2060,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$node[\"Origin\"].json['apiurl']}}/account/{{ $node['Set'].json.accountId }}/user",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=[{\"skip\":0,\"take\":10,\"filter\":{\"logic\":\"and\",\"filters\":[{\"field\":\"username\",\"operator\":\"contains\",\"value\":\"{{ $node['Compliance Data'].json.assignedto }}\"}] } }]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"Generate Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "305bd651-e54b-4bcd-9def-0aad94b05de0",
+      "name": "Fetch User Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2580,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/{{ $node['Compliance Data'].json.DSPComplianceAssocId }}/data",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "f8ae4f28-7210-4b33-9582-c7cfb6e5d805",
+      "name": "Get Company Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -760,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet output = {};\nlet input = JSON.parse($('Get Company Details1').all()[0].json.data[0].dataGrid1);\noutput.locationDropdown = input.map(i =>i.locationType);\n\nreturn output"
+      },
+      "id": "b1367085-18f4-4947-a25c-63078d1094d6",
+      "name": "Get assocId",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Replace Me'].json[\"url\"] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "197e078a-07ef-4805-a4a2-5862e7fc9000",
+      "name": "Get attachment file",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2740,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $('Save DSP Compliance')').all()[0].json;\n//let sendEmailToUser = $('Code33').all()[0].json.sendEmailToUser;\nlet template = \"AmazonComplianceDSP\";\nlet mailTo ;\nlet email = input.email;\n//let status = input.status\nlet senderName = \"Support\";\nlet subject = \"DSP Compliance Status \"+input.status+\" - \"+input.DSPshortCode;\n//let pdfFileArray = [];\npdfFileArray.push({pdfFile:JSON.parse($('Save Attachment4').all()[0].json.document).data.url});\n//let url_final = $('Set').all()[0].json.redirecturl \n ;\n\nlet result = {\n        email: email,\n       template: template,\n        mailTo: email,\n        mailFrom: \"support@eoxvantage.com\",\n        senderName: \"hubtest\",\n        subject: subject,\n        url: $('Set').all()[0].json.redirecturl,\n        apiUrl:$('Set').all()[0].json.apiurl,\n  //pdfFile:pdfFileArray,\n  attachment:false,\n  dataToMap: {\n   companyname : input.companyname,\n   status : input.status,\n    url:$('Set').all()[0].json.redirecturl\n    }\n    };\nreturn result"
+      },
+      "id": "332ee762-1e77-4ed5-9780-32324a0a5ffd",
+      "name": "Data to send to DSP email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "4t9jgMEQfk5Y7mXJ",
+        "options": []
+      },
+      "id": "61b0b108-0b23-4354-a207-215ac480ac71",
+      "name": "Send DSP email",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "4t9jgMEQfk5Y7mXJ",
+        "options": []
+      },
+      "id": "4290bfeb-f3c0-4cb5-b224-99c38690c08e",
+      "name": "Send DSP email1",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $('Save Driver Compliance')').all()[0].json;\n//let sendEmailToUser = $('Code33').all()[0].json.sendEmailToUser;\nlet template = \"AmazonComplianceDriver\";\nlet mailTo ;\nlet email = input.email;\n//let status = input.status\nlet senderName = \"Support\";\nlet subject = input.name+\" - Compliance Status \"+input.status+\" - \"+input.DSPshortCode;\n//let pdfFileArray = [];\n//pdfFileArray.push({pdfFile:JSON.parse($('Save Attachment3').all()[0].json.document).data.url});\n//let url_final = $('Set').all()[0].json.redirecturl \n \n\nlet result = {\n        email: email,\n       template: template,\n        mailTo: email,\n        mailFrom: \"support@eoxvantage.com\",\n        senderName: \"hubtest\",\n        subject: subject,\n        url: $('Set').all()[0].json.redirecturl,\n        apiUrl:$('Set').all()[0].json.apiurl,\n  //pdfFile:pdfFileArray,\n  attachment:false,\n  dataToMap: {\n   name : input.name,\n   status : input.status,\n    url:$('Set').all()[0].json.redirecturl\n    }\n    };\nreturn result"
+      },
+      "id": "c8837c14-c512-4185-9ffc-838a768c3b48",
+      "name": "Data to send to Driver email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $('Webhook').all()[0].json.body;\n//let sendEmailToUser = $('Code33').all()[0].json.sendEmailToUser;\nlet template = (input.isDsp ==\"Yes\")?\"AmazonComplianceDSP\":\"AmazonComplianceDriver\";\nlet mailTo ;\nlet email = input.email;\n//let status = input.status\nlet senderName = \"Support\";\nlet subject = (input.isDsp ==\"Yes\")?\"DSP Compliance Status \"+input.status+\" - \"+input.DSPshortCode : input.name+\" - Compliance Status \"+input.status+\" - \"+input.DSPshortCode ;\nlet pdfFileArray = [];\npdfFileArray.push({pdfFile:JSON.parse($('Save Attachment3').all()[0].json.document).data.url});\n//let url_final = $('Set').all()[0].json.redirecturl \n ;\n\nlet result = {\n        email: email,\n       template: template,\n        mailTo: email,\n        mailFrom: \"support@eoxvantage.com\",\n        senderName: \"hubtest\",\n        subject: subject,\n        url: $('Set').all()[0].json.redirecturl,\n        apiUrl:$('Set').all()[0].json.apiurl,\n  pdfFile:pdfFileArray,\n  attachment:true,\n  dataToMap: {\n   companyname : input.companyname,\n   status : input.status,\n    url:$('Set').all()[0].json.redirecturl,\n    name: input.name\n    }\n    };\nreturn result"
+      },
+      "id": "b9c7bbb2-f5ee-440a-bd83-e446eaaad27a",
+      "name": "Data to send to DSP email1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2440,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "4t9jgMEQfk5Y7mXJ",
+        "options": []
+      },
+      "id": "88da2c33-6963-46e0-8d7a-387cac6b1c94",
+      "name": "Send DSP email2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "amazonCompliancepdf",
+        "options": []
+      },
+      "id": "50d9c7b1-2220-4f06-870c-20809ba8bfa0",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -660,
+        -140
+      ],
+      "webhookId": "6f3620ba-e9eb-4621-8c8e-262afeb6d7aa"
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $('Get Company Details').all()[0].json.data;\nlet output = input.data;\nlet sublist=$('Get Subscriptions').all()[0].json.data;\n\n\n\n\n\nsublist.forEach(item => {\n\n    let a= typeof item.defaultsubtype ==\"string\" ? JSON.parse(item.defaultsubtype):item.defaultsubtype;\n    a=a?.trucking\n \n    if(a && (item.subscriptionname).includes(\"AMAZON COMPLIANCE\")){\n      subscribed=\"yes\";\n        \n        output.subscriptionlist[item.uuid] = {\n          subscriptionname: item.subscriptionname,\n          uuid: item.uuid,\n          subscribed:subscribed\n        };\n        output.selectBoxes[item.uuid]=true;\n    }\n});\noutput.fileId = input.uuid;\noutput.commands = [{\n  command: 'fileSave',\n  entity_name: 'umcompany'\n}];\nreturn input\n"
+      },
+      "id": "555d0eb6-94f3-4cd7-989d-c16a68d8cf39",
+      "name": "Set subscribed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Set1\"].json[\"apiurl\"]}}app/{{ $node['Set1'].json[\"appid\"] }}/pipeline",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/json",
+        "body": "={{ $node['Set subscribed'].json.data }}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "1b45ea32-7b91-4eef-83b9-e24e13a65c06",
+      "name": "Save company",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/search/entity/hdosubscription",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "[{\"take\":100,\"skip\":0}]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "474b46e9-1f82-47bd-bf6d-079e20c03b33",
+      "name": "Get Subscriptions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        580
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "options": []
+      },
+      "id": "09b3af85-8ebb-46ae-9f17-b474cc51a26c",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "534",
+        "options": []
+      },
+      "id": "ddf04b91-d063-404b-890c-ebb84337acba",
+      "name": "Instance API2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "apiurl",
+              "value": "={{ $node[\"Instance API2\"].json[\"apiurl\"] }}/"
+            },
+            {
+              "name": "redirecturl",
+              "value": "={{ $node[\"Instance API2\"].json[\"redirectURL\"] }}/"
+            },
+            {
+              "name": "appid",
+              "value": "=62bf6d03-9716-4fb6-b697-0fd442096e7a"
+            },
+            {
+              "name": "accountId",
+              "value": "cb008fec-b341-4c85-98cc-8726b7931d1c"
+            },
+            {
+              "name": "insurelearnapi",
+              "value": "https://hubstg.insurelearn.com/api/"
+            },
+            {
+              "name": "ILSUSER",
+              "value": "eox_connector"
+            },
+            {
+              "name": "ILSPASSWD",
+              "value": "P9mwT~%26/6Qk@y}hk"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "0aefe057-08b9-4e8c-8a9d-e966793034b2",
+      "name": "Set2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"Set2\"].json[\"apiurl\"] }}auth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "username",
+              "value": "hdoadmin"
+            },
+            {
+              "name": "password",
+              "value": "Welcome2eox!"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "20fed55e-53cc-4ec5-81e7-bead448cb27b",
+      "name": "Generate Token2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        3020,
+        1620
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/search/entity/umadduser",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=[{\"filter\":{\"logic\":\"and\",\"filters\":[{\"field\":\"email\",\"operator\":\"eq\",\"value\":\"{{ $node['Get Company Details1'].json[\"data\"][\"data\"][\"email\"] }}\"}]},\"sort\":[{\"dir\":\"asc\",\"field\":\"username\"}],\"take\":1,\"skip\":0}]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"Generate Token1\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "8e873f38-ab59-4ba0-8774-199e808b1afe",
+      "name": "Get User Details1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2580,
+        1760
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set2'].json[\"apiurl\"] }}app/{{ $node['Set2'].json[\"appid\"] }}/file/user/me/entity/icOnboarding",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=[{\"filter\":{\"logic\":\"and\",\"filters\":[{\"field\":\"amazonDspNumber\",\"operator\":\"contains\",\"value\":\"{{$node['Fetch Location'].json.body.DSPshortCode}}\"}]},\"skip\":0}]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token1\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": []
+      },
+      "id": "68097f1b-88f4-4a0e-8321-0a36bee70d57",
+      "name": "Get Company Details1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fetchLocation",
+        "responseMode": "responseNode",
+        "options": []
+      },
+      "id": "4e727f69-8c2c-440d-8dfa-3af39b5fb8dc",
+      "name": "Fetch Location",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1060,
+        1100
+      ],
+      "webhookId": "7544fa0f-b0b3-4468-b3a8-e7f16ea65bc7",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/search/entity/umadduser",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=[{\"filter\":{\"logic\":\"and\",\"filters\":[{\"field\":\"email\",\"operator\":\"eq\",\"value\":\"{{ $node['Data Fetcher'].json[\"email\"] }}\"}]},\"sort\":[{\"dir\":\"asc\",\"field\":\"username\"}],\"take\":1,\"skip\":0}]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "81ce9517-3b48-4f27-a911-b9140b1a842e",
+      "name": "Get User Details Driver",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2120,
+        940
+      ],
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $node['Set1'].json[\"apiurl\"] }}app/{{ $node['Set1'].json[\"appid\"] }}/file/search/entity/amazonCompliance/assoc/{{ $node['Get User Details Driver'].json.data[0].uuid}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"get Token\"].json[\"data\"][\"jwt\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true
+            }
+          }
+        }
+      },
+      "id": "31c54bb7-20ee-45ad-b97c-cdf73d530338",
+      "name": "Get file for other drivers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2360,
+        940
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "d6706427-6a99-44b2-a369-432744cf16b6",
+              "leftValue": "={{ $node['Get file for other drivers'].json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": []
+      },
+      "id": "f42e5157-739e-41b1-98e3-f8dcf9ebda0f",
+      "name": "If9",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        940
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": []
+      },
+      "id": "963db8e2-229f-4f4c-9cf0-9f8a9ac23cd4",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2300,
+        580
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b6b5ccf7-01cb-4b91-9e44-cc958c921318",
+      "name": "Replace Me",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2540,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "9iw8YipOTn42Sjsv",
+        "options": []
+      },
+      "id": "e148c5ae-ed84-4899-981a-61c6bcb714e5",
+      "name": "get Token",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let apiUrl = $('Instance API1').all()[0].json.apiurl+\"/\";\n//let redirectUrl = $('Instance API1').all()[0].json.redirectURL;\nreturn {apiUrl : apiUrl};"
+      },
+      "id": "c8a0b48f-9608-4e9d-9181-f333c150fedb",
+      "name": "generate token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "9iw8YipOTn42Sjsv",
+        "options": []
+      },
+      "id": "87f3be63-699b-4369-9b85-4724c4f60f78",
+      "name": "get Token1",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let apiUrl = $('Instance API2').all()[0].json.apiurl+\"/\";\n//let redirectUrl = $('Instance API1').all()[0].json.redirectURL;\nreturn {apiUrl : apiUrl};"
+      },
+      "id": "514be632-4633-402e-bda2-1c5c50c8dcf9",
+      "name": "generate token1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "9iw8YipOTn42Sjsv",
+        "options": []
+      },
+      "id": "47e0d3bc-608b-413a-a548-3eedc333aecd",
+      "name": "get Token2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let apiUrl = $('Instance API').all()[0].json.apiurl+\"/\";\n//let redirectUrl = $('Instance API1').all()[0].json.redirectURL;\nreturn {apiUrl : apiUrl};"
+      },
+      "id": "225f2986-a82e-4150-9e54-b3ac1c2366cd",
+      "name": "generate token2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "a0dd741c-4fe9-46f5-bf99-8ad9e8467549",
+              "leftValue": "={{ $node['get attachment file from my company details'].json }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "9ab63d74-aea9-45ae-a258-b46f40093a71",
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        560
+      ]
+    }
+  ],
+  "connections": {
+    "Check if dsp compliance record created": {
+      "main": [
+        [
+          {
+            "node": "Compliance data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Labor data check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Labor data check": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Data Fetcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Fetcher": {
+      "main": [
+        [
+          {
+            "node": "Get User Details Driver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Driver Compliance data": {
+      "main": [
+        [
+          {
+            "node": "Save Driver Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Driver Compliance": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save DSP Compliance": {
+      "main": [
+        [
+          {
+            "node": "Get Subscriptions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If11": {
+      "main": [
+        [
+          {
+            "node": "Data for mapping",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Mapping3": {
+      "main": [
+        [
+          {
+            "node": "Save Attachment3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Attachment3": {
+      "main": [
+        [
+          {
+            "node": "Save status Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data for mapping": {
+      "main": [
+        [
+          {
+            "node": "PDF Mapping3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "User Details compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instance API": {
+      "main": [
+        [
+          {
+            "node": "generate token2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Details compliance": {
+      "main": [
+        [
+          {
+            "node": "If11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instance API1": {
+      "main": [
+        [
+          {
+            "node": "generate token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set1": {
+      "main": [
+        [
+          {
+            "node": "Get Company Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compliance Data": {
+      "main": [
+        [
+          {
+            "node": "Instance API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag to save companydetails": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save status Compliance": {
+      "main": [
+        [
+          {
+            "node": "Data to send to DSP email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check if attachment exists": {
+      "main": [
+        [
+          {
+            "node": "get attachment file from my company details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Labor data check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get attachment file from my company details": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Attachment4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company Details": {
+      "main": [
+        [
+          {
+            "node": "Get User Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Details": {
+      "main": [
+        [
+          {
+            "node": "Get DSP admin file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compliance data": {
+      "main": [
+        [
+          {
+            "node": "Save DSP Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get DSP admin file": {
+      "main": [
+        [
+          {
+            "node": "Check if dsp compliance record created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get attachment file": {
+      "main": [
+        [
+          {
+            "node": "Save Attachment4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data to send to DSP email": {
+      "main": [
+        [
+          {
+            "node": "Send DSP email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data to send to Driver email": {
+      "main": [
+        [
+          {
+            "node": "Send DSP email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data to send to DSP email1": {
+      "main": [
+        [
+          {
+            "node": "Send DSP email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Instance API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set subscribed": {
+      "main": [
+        [
+          {
+            "node": "Save company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save company": {
+      "main": [
+        [
+          {
+            "node": "check if attachment exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Subscriptions": {
+      "main": [
+        [
+          {
+            "node": "Set subscribed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instance API2": {
+      "main": [
+        [
+          {
+            "node": "generate token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set2": {
+      "main": [
+        [
+          {
+            "node": "Get Company Details1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Location": {
+      "main": [
+        [
+          {
+            "node": "Instance API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company Details1": {
+      "main": [
+        [
+          {
+            "node": "Get assocId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get assocId": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Details Driver": {
+      "main": [
+        [
+          {
+            "node": "Get file for other drivers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get file for other drivers": {
+      "main": [
+        [
+          {
+            "node": "If9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If9": {
+      "main": [
+        [
+          {
+            "node": "Driver Compliance data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Labor data check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Get attachment file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate token": {
+      "main": [
+        [
+          {
+            "node": "get Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get Token": {
+      "main": [
+        [
+          {
+            "node": "Set1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate token1": {
+      "main": [
+        [
+          {
+            "node": "get Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get Token1": {
+      "main": [
+        [
+          {
+            "node": "Set2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate token2": {
+      "main": [
+        [
+          {
+            "node": "get Token2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get Token2": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Labor data check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "16e7cd10-4c22-4f8a-8ffd-a0a1e1a9301a",
+  "triggerCount": 1,
+  "tags": []
+}
